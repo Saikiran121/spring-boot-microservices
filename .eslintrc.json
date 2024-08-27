@@ -1,6 +1,8 @@
 {
-  "env": {
-    "node": true
+  "languageOptions": {
+    "globals": {
+      "node": true
+    }
   },
   "extends": "eslint:recommended",
   "rules": {
