@@ -26,8 +26,19 @@ pipeline {
 	stage('Testing') {
             steps {
                 script {
-                    echo 'Running tests...'
-                    sh 'mvn test'
+                    def services = [
+                        'discovery-server',
+                        'movie-catalog-service',
+                        'movie-info-service',
+                        'ratings-data-service'
+                    ]
+
+                    for (service in services) {
+                        dir("spring-boot-microservices/${service}") {
+                            echo "Running tests for ${service}..."
+                            sh 'mvn test'
+                        }
+                    }
                 }
             }
         }
