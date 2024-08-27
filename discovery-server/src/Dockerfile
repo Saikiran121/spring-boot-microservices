@@ -5,11 +5,13 @@ FROM openjdk:11
 WORKDIR /app
 
 # Copy the Maven wrapper files
-COPY mvnw .mvn/wrapper/maven-wrapper.jar .
-COPY .mvn/wrapper/maven-wrapper.properties .
+COPY mvnw .mvn/wrapper/maven-wrapper.jar /app/
+
+# Copy the Maven wrapper properties file
+COPY .mvn/wrapper/maven-wrapper.properties /app/
 
 # Copy the pom.xml file
-COPY pom.xml .
+COPY pom.xml /app/
 
 # Download the Maven wrapper JAR file
 RUN ./mvnw -N io.takari:maven:wrapper -B
@@ -23,7 +25,7 @@ ENV MAVEN_REPOURL=${MAVEN_REPOURL}
 RUN ./mvnw clean package -DskipTests
 
 # Copy the application JAR file
-COPY target/discovery-server-0.0.1-SNAPSHOT.jar app.jar
+COPY target/discovery-server-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Expose the port
 EXPOSE 8761
