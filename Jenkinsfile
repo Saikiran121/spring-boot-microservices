@@ -26,9 +26,8 @@ pipeline {
 	stage('Testing') {
             steps {
                 script {
-                    // Run tests
                     echo 'Running tests...'
-                    sh './run-tests.sh'  // Replace with your test command or script
+                    sh 'mvn test'
                 }
             }
         }
