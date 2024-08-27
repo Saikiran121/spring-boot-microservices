@@ -35,6 +35,9 @@ pipeline {
 
                     for (service in services) {
                         dir("spring-boot-microservices/${service}") {
+                            echo "Current directory: ${pwd()}"
+                            echo "Contents:"
+                            sh 'ls -la'
                             echo "Running tests for ${service}..."
                             sh 'mvn test'
                         }
