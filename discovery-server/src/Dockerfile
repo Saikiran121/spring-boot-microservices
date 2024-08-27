@@ -5,7 +5,7 @@ FROM openjdk:11
 WORKDIR /app
 
 # Copy the Maven wrapper files
-COPY mvnw .
+COPY mvnw .mvn/wrapper/maven-wrapper.jar .
 COPY .mvn/wrapper/maven-wrapper.properties .
 
 # Copy the pom.xml file
