@@ -12,6 +12,16 @@ pipeline {
                 git 'https://github.com/Saikiran121/spring-boot-microservices.git'
             }
         }
+	
+	stage('Linting') {
+            steps {
+                script {
+                    // Run linting tools
+                    echo 'Running linting...'
+                    sh 'eslint .'
+                }
+            }
+        }
         
         stage('SonarQube Analysis') {
             steps {
