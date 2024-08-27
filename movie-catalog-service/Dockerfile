@@ -4,10 +4,13 @@ FROM maven:3.8.6-openjdk-11 AS build
 # Set the working directory
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml
+# Copy Maven wrapper and Maven project files
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
+
+# Make the Maven wrapper executable
+RUN chmod +x mvnw
 
 # Copy the source code
 COPY src src
