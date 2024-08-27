@@ -1,34 +1,34 @@
-# Use an official Maven image to build the application
+# Define the base image for the build stage
 FROM maven:3.8.6-openjdk-11 AS build
 
 # Set the working directory
 WORKDIR /app
 
-# Copy Maven wrapper and Maven project files
+# Copy Maven Wrapper and configuration files
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Make the Maven wrapper executable
+# Make the Maven Wrapper executable
 RUN chmod +x mvnw
 
-# Copy the source code
+# Copy source code
 COPY src src
 
-# Run Maven to build the application
+# Build the application, skipping tests
 RUN ./mvnw clean package -DskipTests
 
-# Use an official OpenJDK runtime as the base image for the runtime environment
+# Define the base image for the runtime stage
 FROM openjdk:11-jre-slim
 
-# Set the working directory
+# Set the working directory for runtime
 WORKDIR /app
 
-# Copy the built JAR file from the build stage
-COPY --from=build /app/target/movie-catalog-service-0.0.1-SNAPSHOT.jar /app/movie-catalog-service.jar
+# Copy the built jar file from the build stage
+COPY --from=build /app/target/movie-catalog-service.jar /app/movie-catalog-service.jar
 
-# Expose the port the application will run on
+# Expose the port the app runs on
 EXPOSE 8080
 
-# Command to run the application
+# Run the application
 ENTRYPOINT ["java", "-jar", "/app/movie-catalog-service.jar"]
