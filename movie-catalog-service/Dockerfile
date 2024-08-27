@@ -1,34 +1,27 @@
-# Define the base image for the build stage
-FROM maven:3.8.6-openjdk-11 AS build
-
-# Set the working directory
-WORKDIR /app
-
-# Copy Maven Wrapper and configuration files
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-
-# Make the Maven Wrapper executable
-RUN chmod +x mvnw
-
-# Copy source code
-COPY src src
-
-# Build the application, skipping tests
-RUN ./mvnw clean package -DskipTests
-
-# Define the base image for the runtime stage
+# Use an official OpenJDK image as a base
 FROM openjdk:11-jre-slim
 
-# Set the working directory for runtime
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the built jar file from the build stage
-COPY --from=build /app/target/movie-catalog-service.jar /app/movie-catalog-service.jar
+# Copy the Maven wrapper files
+COPY mvnw.cmd .
+COPY .mvn .mvn
 
-# Expose the port the app runs on
+# Copy the pom.xml to the working directory
+COPY pom.xml .
+
+# Download the project dependencies
+RUN ./mvnw.cmd dependency:go-offline
+
+# Copy the source code into the container
+COPY src ./src
+
+# Build the application
+RUN ./mvnw.cmd package -DskipTests
+
+# Expose the port that the application will run on
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "/app/movie-catalog-service.jar"]
+# Run the Spring Boot application
+CMD ["java", "-jar", "target/movie-catalog-service-0.0.1-SNAPSHOT.jar"]
