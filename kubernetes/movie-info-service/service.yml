@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-info-service
+  namespace: default
+  labels:
+    app: movie-info-service
+spec:
+  selector:
+    app: movie-info-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer

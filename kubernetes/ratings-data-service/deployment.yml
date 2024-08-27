@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-service
+  labels:
+    app: ratings-service
+spec:
+  replicas: 3  # Number of pod replicas
+  selector:
+    matchLabels:
+      app: ratings-service
+  template:
+    metadata:
+      labels:
+        app: ratings-service
+    spec:
+      containers:
+      - name: ratings-service
+        image: your-docker-registry/ratings-service:0.0.1-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always

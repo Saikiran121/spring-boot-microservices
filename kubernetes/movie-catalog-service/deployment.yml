@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-catalog-service
+  namespace: default
+  labels:
+    app: movie-catalog-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: movie-catalog-service
+  template:
+    metadata:
+      labels:
+        app: movie-catalog-service
+    spec:
+      containers:
+        - name: movie-catalog-service
+          image: saikiran8050/movie-catalog-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "staging"  # Change this to "production" for production environment
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+      imagePullSecrets:
+        - name: regcred  # Use the name of the Kubernetes secret for your Docker registry credentials
