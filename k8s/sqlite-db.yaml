@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlite-db
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlite-db
+  template:
+    metadata:
+      labels:
+        app: sqlite-db
+    spec:
+      containers:
+        - name: sqlite
+          image: nouchka/sqlite3:latest
+          volumeMounts:
+            - name: sqlite-data
+              mountPath: /sqlite
+      volumes:
+        - name: sqlite-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqlite-db
+  namespace: microservices
+spec:
+  selector:
+    app: sqlite-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

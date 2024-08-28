@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-info-service
+  namespace: microservices
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: movie-info-service
+  template:
+    metadata:
+      labels:
+        app: movie-info-service
+    spec:
+      containers:
+        - name: movie-info-service
+          image: saikiran8050/movie-info-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DISCOVERY_SERVER_URL
+              value: "http://discovery-server:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-info-service
+  namespace: microservices
+spec:
+  selector:
+    app: movie-info-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
