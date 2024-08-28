@@ -3,7 +3,10 @@ pipeline {
 
     environment {
         DOCKER_REGISTRY_CREDENTIALS = 'docker'
-        KUBECONFIG = '/var/lib/jenkins/.kube/config'  // Ensure this path matches where the kubeconfig will be written
+        AWS_CREDENTIALS_ID = 'aws-jenkins-demo'
+        AWS_REGION = 'ap-south-1'
+        CLUSTER_NAME = 'eksdmo'
+        KUBECONFIG = '/var/lib/jenkins/.kube/config' // Ensure this is correct
     }
 
     stages {
@@ -16,6 +19,7 @@ pipeline {
         stage('Linting') {
             steps {
                 script {
+                    // Run linting tools
                     echo 'Running linting...'
                     sh 'eslint .'
                 }
@@ -54,31 +58,37 @@ pipeline {
             }
         }
 
-        stage('Configure Kubernetes') {
+        stage('Configure AWS CLI') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: AWS_CREDENTIALS_ID]]) {
+                    script {
+                        echo 'Configuring AWS CLI...'
+                        sh """
+                            aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+                            aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+                            aws configure set region ${AWS_REGION}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Update Kubeconfig') {
             steps {
                 script {
                     echo 'Updating kubeconfig...'
-                    sh 'aws eks --region ap-south-1 update-kubeconfig --name eksdmo'
+                    sh """
+                        aws eks --region ${AWS_REGION} update-kubeconfig --name ${CLUSTER_NAME}
+                    """
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
-            when {
-                branch 'master'
-            }
             steps {
                 script {
-                    echo 'Deploying Kubernetes YAML files...'
-                    sh 'kubectl apply -f discovery-server.yaml'
-                    sh 'kubectl apply -f ingress.yaml'
-                    sh 'kubectl apply -f movie-info-service.yaml'
-                    sh 'kubectl apply -f movie-catalog-service.yaml'
-                    sh 'kubectl apply -f ratings-data-service.yaml'
-                    sh 'kubectl apply -f sqlite-db.yaml'
-                    sh 'kubectl apply -f network-policy.yaml'
-                    sh 'kubectl apply -f namespace.yml'
-                    sh 'kubectl apply -f frontend.yaml'
+                    echo 'Deploying to Kubernetes...'
+                    sh 'kubectl apply -f k8s/'
                 }
             }
         }
