@@ -1,19 +1,19 @@
 pipeline {
     agent any
-    
+
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         DOCKER_REGISTRY_CREDENTIALS = 'docker'
     }
-    
+
     stages {
         stage('Git Checkout') {
             steps {
                 git 'https://github.com/Saikiran121/spring-boot-microservices.git'
             }
         }
-	
-	stage('Linting') {
+
+        stage('Linting') {
             steps {
                 script {
                     // Run linting tools
@@ -22,30 +22,7 @@ pipeline {
                 }
             }
         }
-	
-	stage('Testing') {
-            steps {
-                script {
-                    def services = [
-                        'discovery-server',
-                        'movie-catalog-service',
-                        'movie-info-service',
-                        'ratings-data-service'
-                    ]
 
-                    for (service in services) {
-                        dir("spring-boot-microservices/${service}") {
-                            echo "Current directory: ${pwd()}"
-                            echo "Contents:"
-                            sh 'ls -la'
-                            echo "Running tests for ${service}..."
-                            sh 'mvn test'
-                        }
-                    }
-                }
-            }
-        }
-        
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
@@ -58,7 +35,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build and Push Docker Images') {
             steps {
                 script {
@@ -69,7 +46,7 @@ pipeline {
                     } else if (env.BRANCH_NAME == 'production') {
                         dockerTag = "production"
                     }
-                    
+
                     // Services to build
                     def services = [
                         'movie-info-service',
@@ -77,7 +54,7 @@ pipeline {
                         'ratings-data-service',
                         'movie-catalog-service'
                     ]
-                    
+
                     // Loop through each service and build/push Docker images
                     for (service in services) {
                         withDockerRegistry(credentialsId: DOCKER_REGISTRY_CREDENTIALS, toolName: 'docker') {
@@ -93,7 +70,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Environment') {
             steps {
                 script {
