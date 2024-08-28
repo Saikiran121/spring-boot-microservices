@@ -5,7 +5,7 @@ pipeline {
         DOCKER_REGISTRY_CREDENTIALS = 'docker'
         AWS_CREDENTIALS_ID = 'aws-jenkins-demo'
         AWS_REGION = 'ap-south-1'
-        CLUSTER_NAME = 'eksdmo'
+        CLUSTER_NAME = 'eksdemo' // Updated cluster name
         KUBECONFIG = '/var/lib/jenkins/.kube/config' // Ensure this is correct
     }
 
@@ -19,7 +19,6 @@ pipeline {
         stage('Linting') {
             steps {
                 script {
-                    // Run linting tools
                     echo 'Running linting...'
                     sh 'eslint .'
                 }
