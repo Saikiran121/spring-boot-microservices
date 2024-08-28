@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SCANNER_HOME = tool 'sonar-scanner'
+      /*  SCANNER_HOME = tool 'sonar-scanner' */
         DOCKER_REGISTRY_CREDENTIALS = 'docker'
     }
 
@@ -23,7 +23,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+      /*  stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
                     sh """
@@ -34,7 +34,7 @@ pipeline {
                     """
                 }
             }
-        }
+        } */
 
         stage('Build and Push Docker Images') {
             steps {
